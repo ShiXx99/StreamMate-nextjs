@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  image          String?
+  watchlist      WatchItem[]
+  friends        Friendship[] @relation("userFriends")
+  friendOf       Friendship[] @relation("friendOf")
+}
+
+model WatchItem {
+  id       String   @id @default(cuid())
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
+  tmdbId   Int
+  addedAt  DateTime @default(now())
+}
+
+model Friendship {
+  id         String   @id @default(cuid())
+  user       User     @relation("userFriends", fields: [userId], references: [id])
+  userId     String
+  friend     User     @relation("friendOf", fields: [friendId], references: [id])
+  friendId   String
+  createdAt  DateTime @default(now())
+  status     String
+}
